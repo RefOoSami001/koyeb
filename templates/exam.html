@@ -9,6 +9,7 @@
     <title>Exam - {{ exam_id }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
+        /* Your existing CSS styles */
         * {
             margin: 0;
             padding: 0;
@@ -23,7 +24,6 @@
             left: 0;
             z-index: -1;
         }
-        /* Navbar Styles */
         .navbar {
             display: flex;
             justify-content: space-between;
@@ -55,8 +55,6 @@
         .navbar button:hover {
             background-color: rgba(255, 255, 255, 0.1);
         }
-
-        /* Rest of the styles remain the same */
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -64,7 +62,7 @@
             background-color: transparent;
             border-radius: 10px;
             position: relative;
-            padding-bottom: 90px; /* Space for fixed navigation buttons */
+            padding-bottom: 90px;
         }
         .progress-bar {
             width: 100%;
@@ -85,7 +83,7 @@
             margin-bottom: 20px;
             border-radius: 8px;
             background-color: #fdfdfd2a;
-            backdrop-filter: blur(10px); /* Glass effect */
+            backdrop-filter: blur(10px);
         }
         .card.active {
             display: block;
@@ -206,11 +204,9 @@
             font-weight: 500;
             color: #555;
         }
-
-        /* Sound Control Button */
         .sound-control {
             position: fixed;
-            bottom: 70px; /* Adjusted for navbar */
+            bottom: 70px;
             right: 15px;
             background-color: #007bff98;
             color: white;
@@ -228,7 +224,6 @@
         .sound-control:hover {
             background-color: #0056b3;
         }
-
         .victory-screen {
             display: none;
             position: fixed;
@@ -244,7 +239,6 @@
             z-index: 1000;
             animation: fadeIn 0.5s ease;
         }
-
         .close-btn {
             position: absolute;
             top: 20px;
@@ -256,23 +250,19 @@
             cursor: pointer;
             transition: color 0.3s ease;
         }
-
         .close-btn:hover {
-            color: #dc3545; /* Red color on hover */
+            color: #dc3545;
         }
-
         .victory-screen h1 {
             font-size: 48px;
             color: #28a745;
             margin-bottom: 20px;
         }
-
         .victory-screen p {
             font-size: 24px;
             color: #555;
             margin-bottom: 20px;
         }
-
         .victory-screen button {
             padding: 10px 20px;
             background-color: #007bff;
@@ -283,12 +273,9 @@
             transition: background-color 0.3s ease;
             margin: 5px;
         }
-
         .victory-screen button:hover {
             background-color: #0056b3;
         }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
             .container {
                 padding: 15px;
@@ -310,16 +297,24 @@
                 font-size: 14px;
             }
         }
-        /* Scenario Styling */
-    .scenario {
-        font-size: 14px;
-        color: #555;
-        margin-bottom: 15px;
-        padding: 10px;
-        background-color: #F5FFF9;
-        border-radius: 8px;
-        border: 1px solid #e1f8ea;
-    }
+        .scenario {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #F5FFF9;
+            border-radius: 8px;
+            border: 1px solid #e1f8ea;
+        }
+        #loading-indicator {
+            text-align: center;
+            padding: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+        #loading-indicator i {
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
@@ -345,36 +340,15 @@
             <div class="progress" id="progress"></div>
         </div>
 
-        <!-- Questions -->
-        {% if questions %}
-            {% for question in questions %}
-                <div class="card" data-index="{{ loop.index0 }}">
-                    <h3>
-                        {% if question.card_type == 'Case Scenario Multiple Choice Question' %}
-                            <div class="scenario">
-                                {{ question.case_scenario_details }}
-                            </div>
-                            <div class="question">
-                                {{ question.question }}
-                            </div>
-                        {% else %}
-                            {{ question.question }}
-                        {% endif %}
-                    </h3>
-                    <div class="options">
-                        {% for option in question.distractor_answers_for_multiple_choice_question %}
-                            <div class="option" data-value="{{ option }}">{{ option }}</div>
-                        {% endfor %}
-                        <div class="option" data-value="{{ question.answer }}">{{ question.answer }}</div>
-                    </div>
-                    <div class="reasoning">
-                        <p><strong>More Info:</strong><br> {{ question.reasoning_for_correct_answer }}</p>
-                    </div>
-                </div>
-            {% endfor %}
-        {% else %}
-            <p>No questions found for this exam.</p>
-        {% endif %}
+        <!-- Loading Indicator -->
+        <div id="loading-indicator">
+            <i class="fas fa-spinner fa-spin"></i> Loading questions...
+        </div>
+
+        <!-- Questions Container -->
+        <div id="questions-container">
+            <!-- Questions will be dynamically added here -->
+        </div>
     </div>
 
     <!-- Fixed Navigation Buttons -->
@@ -382,7 +356,7 @@
         <button id="prev-btn" disabled>
             <i class="fas fa-arrow-left"></i> Previous
         </button>
-        <div class="question-counter" id="question-counter">1 of {{ questions|length }}</div>
+        <div class="question-counter" id="question-counter">0 of 0</div>
         <button id="next-btn">
             Next <i class="fas fa-arrow-right"></i>
         </button>
@@ -402,52 +376,162 @@
 
         <!-- Victory Content -->
         <h1>🎉 Congratulations!</h1>
-        <p>You scored <span id="score"></span> out of {{ questions|length }}!</p>
+        <p>You scored <span id="score"></span> out of <span id="total-questions"></span>!</p>
         <button id="share-btn">
             <i class="fas fa-share"></i> Share Exam Link
         </button>
     </div>
-
 
     <!-- Audio for Sound Effects -->
     <audio id="correct-sound" src="https://cdn.freesound.org/previews/476/476178_6101353-lq.mp3"></audio>
     <audio id="incorrect-sound" src="https://cdn.freesound.org/previews/590/590035_129727-lq.mp3"></audio>
 
     <script>
-        const cards = document.querySelectorAll('.card');
+        const deckDataId = "{{ exam_id }}"; // Get the deck_data_id from the template
+        const questionsContainer = document.getElementById('questions-container');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const questionCounter = document.getElementById('question-counter');
         const prevBtn = document.getElementById('prev-btn');
         const nextBtn = document.getElementById('next-btn');
         const progressBar = document.getElementById('progress');
-        const questionCounter = document.getElementById('question-counter');
         const correctSound = document.getElementById('correct-sound');
         const incorrectSound = document.getElementById('incorrect-sound');
         const soundControl = document.getElementById('sound-control');
         const victoryScreen = document.getElementById('victory-screen');
         const scoreDisplay = document.getElementById('score');
+        const totalQuestionsDisplay = document.getElementById('total-questions');
         const shareBtn = document.getElementById('share-btn');
         const closeBtn = document.getElementById('close-btn');
         let currentIndex = 0;
         let answeredCount = 0;
         let score = 0;
         let isSoundEnabled = true;
-        let wrongAnswers = []; // Store indices of questions answered incorrectly
+        let wrongAnswers = [];
+        let questions = [];
+        let previousQuestionLength = 0; // Track the number of questions fetched in the previous request
 
-        // Show the first card initially
-        cards[currentIndex].classList.add('active');
+        // Function to fetch questions
+        async function fetchQuestions() {
+            try {
+                const response = await fetch(`/fetch_questions/${deckDataId}`);
+                const data = await response.json();
 
-        // Update progress bar
-        function updateProgress() {
-            const progress = (answeredCount / cards.length) * 100;
-            progressBar.style.width = `${progress}%`;
+                if (data.questions && data.questions.length > 0) {
+                    // Check if new questions were added
+                    if (data.questions.length > previousQuestionLength) {
+                        questions = data.questions; // Update the questions array
+                        previousQuestionLength = questions.length; // Update the previous count
+                        renderQuestions(questions); // Render the new questions
+                        updateQuestionCounter();
+                        loadingIndicator.style.display = 'none';
+                    }
+
+                    // Stop fetching if no new questions are added
+                    if (data.questions.length === previousQuestionLength) {
+                        clearInterval(fetchInterval); // Stop fetching
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching questions:', error);
+            }
         }
 
-        // Update question counter
-        function updateQuestionCounter() {
-            questionCounter.textContent = `${currentIndex + 1} of ${cards.length}`;
+        // Function to render questions
+        function renderQuestions(questions) {
+            questionsContainer.innerHTML = ''; // Clear existing questions
+            questions.forEach((question, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.setAttribute('data-index', index);
+                card.innerHTML = `
+                    <h3>
+                        ${question.card_type === 'Case Scenario Multiple Choice Question' ?
+                            `<div class="scenario">${question.case_scenario_details}</div>
+                            <div class="question">${question.question}</div>` :
+                            question.question
+                        }
+                    </h3>
+                    <div class="options">
+                        ${shuffleOptions(question.distractor_answers_for_multiple_choice_question, question.answer).map(option => `
+                            <div class="option" data-value="${option}">${option}</div>
+                        `).join('')}
+                    </div>
+                    <div class="reasoning">
+                        <p><strong>More Info:</strong><br> ${question.reasoning_for_correct_answer}</p>
+                    </div>
+                `;
+                questionsContainer.appendChild(card);
+            });
+
+            // Show the first card
+            showCard(currentIndex);
+
+            // Add event listeners for options
+            addOptionEventListeners();
+        }
+
+        // Function to shuffle options (correct answer is randomly placed)
+        function shuffleOptions(distractors, correctAnswer) {
+            const allOptions = [...distractors, correctAnswer];
+            for (let i = allOptions.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+            }
+            return allOptions;
+        }
+
+        // Function to add event listeners for options
+        function addOptionEventListeners() {
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                const options = card.querySelectorAll('.option');
+                const reasoning = card.querySelector('.reasoning');
+                const correctAnswer = card.querySelector('.option[data-value="' + questions[index].answer + '"]');
+
+                options.forEach(option => {
+                    option.addEventListener('click', () => {
+                        // Disable all options after one is selected
+                        options.forEach(opt => {
+                            opt.classList.add('disabled');
+                            opt.style.pointerEvents = 'none';
+                        });
+
+                        // Mark the selected option
+                        option.classList.add('selected');
+
+                        // Show reasoning
+                        reasoning.style.display = 'block';
+
+                        // Check if the selected option is correct
+                        if (option.dataset.value === correctAnswer.dataset.value) {
+                            option.classList.add('correct');
+                            if (isSoundEnabled) correctSound.play(); // Play correct sound
+                            score++;
+                        } else {
+                            option.classList.add('incorrect');
+                            correctAnswer.classList.add('correct');
+                            if (isSoundEnabled) incorrectSound.play(); // Play incorrect sound
+                            wrongAnswers.push(index); // Store the index of the wrong answer
+                        }
+
+                        // Update progress
+                        answeredCount++;
+                        updateProgress();
+
+                        // Check if all questions are answered
+                        if (answeredCount === questions.length) {
+                            victoryScreen.style.display = 'flex';
+                            scoreDisplay.textContent = score;
+                            totalQuestionsDisplay.textContent = questions.length;
+                        }
+                    });
+                });
+            });
         }
 
         // Function to show the current card
         function showCard(index) {
+            const cards = document.querySelectorAll('.card');
             cards.forEach((card, i) => {
                 card.classList.toggle('active', i === index);
             });
@@ -456,13 +540,15 @@
             updateQuestionCounter();
         }
 
-        // Shuffle options for the current card
-        function shuffleOptions(card) {
-            const optionsContainer = card.querySelector('.options');
-            const options = Array.from(optionsContainer.children);
-            options.sort(() => Math.random() - 0.5);
-            optionsContainer.innerHTML = '';
-            options.forEach(option => optionsContainer.appendChild(option));
+        // Function to update the question counter
+        function updateQuestionCounter() {
+            questionCounter.textContent = `${currentIndex + 1} of ${questions.length}`;
+        }
+
+        // Function to update the progress bar
+        function updateProgress() {
+            const progress = (answeredCount / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
         }
 
         // Event listeners for navigation buttons
@@ -474,56 +560,10 @@
         });
 
         nextBtn.addEventListener('click', () => {
-            if (currentIndex < cards.length - 1) {
+            if (currentIndex < questions.length - 1) {
                 currentIndex++;
                 showCard(currentIndex);
-                shuffleOptions(cards[currentIndex]); // Shuffle options for the new card
             }
-        });
-
-        // Event listeners for selecting options
-        cards.forEach((card, index) => {
-            const options = card.querySelectorAll('.option');
-            const reasoning = card.querySelector('.reasoning');
-            const correctAnswer = card.querySelector('.option[data-value="' + card.querySelector('.options').lastElementChild.dataset.value + '"]');
-
-            options.forEach(option => {
-                option.addEventListener('click', () => {
-                    // Disable all options after one is selected
-                    options.forEach(opt => {
-                        opt.classList.add('disabled');
-                        opt.style.pointerEvents = 'none';
-                    });
-
-                    // Mark the selected option
-                    option.classList.add('selected');
-
-                    // Show reasoning
-                    reasoning.style.display = 'block';
-
-                    // Check if the selected option is correct
-                    if (option.dataset.value === correctAnswer.dataset.value) {
-                        option.classList.add('correct');
-                        if (isSoundEnabled) correctSound.play(); // Play correct sound
-                        score++;
-                    } else {
-                        option.classList.add('incorrect');
-                        correctAnswer.classList.add('correct');
-                        if (isSoundEnabled) incorrectSound.play(); // Play incorrect sound
-                        wrongAnswers.push(index); // Store the index of the wrong answer
-                    }
-
-                    // Update progress
-                    answeredCount++;
-                    updateProgress();
-
-                    // Check if all questions are answered
-                    if (answeredCount === cards.length) {
-                        victoryScreen.style.display = 'flex';
-                        scoreDisplay.textContent = score;
-                    }
-                });
-            });
         });
 
         // Sound control button
@@ -546,67 +586,14 @@
             }
         });
 
-
         // Close victory screen button
         closeBtn.addEventListener('click', () => {
             victoryScreen.style.display = 'none';
         });
 
-        // Initialize question counter
-        updateQuestionCounter();
-        // Initialize Particles.js
-        particlesJS('particles-js', {
-            "particles": {
-                "number": {
-                    "value": 100,
-                    "density": {
-                        "enable": true,
-                        "value_area": 800
-                    }
-                },
-                "color": {
-                    "value": ["#FFCA28", "#FFD54F", "#FFE082", "#FFECB3", "#FFF8E1", "#E3F2FD", "#BBDEFB", "#90CAF9", "#64B5F6", "#42A5F5"]
-                },
-                "shape": {
-                    "type": "circle",
-                    "stroke": {
-                        "width": 0,
-                        "color": "#000000"
-                    }
-                },
-                "opacity": {
-                    "value": 0.6,
-                    "anim": {
-                        "enable": true,
-                        "speed": 1,
-                        "opacity_min": 0.3
-                    }
-                },
-                "size": {
-                    "value": 4,
-                    "random": true
-                },
-                "move": {
-                    "enable": true,
-                    "speed": 1,
-                    "direction": "bottom",
-                    "random": false,
-                    "straight": false,
-                    "out_mode": "out"
-                }
-            },
-            "interactivity": {
-                "events": {
-                    "onhover": {
-                        "enable": false
-                    },
-                    "onclick": {
-                        "enable": false
-                    }
-                }
-            },
-            "retina_detect": true
-        });
+        // Start fetching questions periodically
+        const fetchInterval = setInterval(fetchQuestions, 7000); // Fetch every 5 seconds
+        fetchQuestions(); // Fetch immediately on page load
     </script>
 </body>
 </html>
