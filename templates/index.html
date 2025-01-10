@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/webp" href="https://images.genai.works/featured_image_92ec8d0e6a.webp?width=600&height=600&quality=50">
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <title>MCQ Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #F5FFF9;
+            color: rgb(255, 255, 255);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .navbar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .navbar .buttons {
+            display: flex;
+            font-size: 12px;
+            gap: 10px;
+        }
+        .navbar button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            border: 1px solid rgba(0, 0, 0, 0);
+            border-radius: 5px;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .navbar button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.3);
+            
+        }
+
+        .card {
+            border-radius: 10px;
+            width: 100%;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+
+        .drop_box {
+            margin: 10px 0;
+            padding: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            border: 3px dotted #a3a3a3;
+            border-radius: 5px;
+        }
+
+        .drop_box h4 {
+            font-size: 16px;
+            font-weight: 400;
+            color: #2e2e2e;
+        }
+
+        .drop_box p {
+            margin-top: 10px;
+            margin-bottom: 20px;
+            font-size: 12px;
+            color: #a3a3a3;
+        }
+
+        .btn {
+            text-decoration: none;
+            background-color: #005af0;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            outline: none;
+            transition: 0.3s;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #ffffff;
+            color: #005af0;
+        }
+
+        .form input {
+            margin: 10px 0;
+            width: 100%;
+            background-color: #e2e2e2;
+            border: none;
+            outline: none;
+            padding: 12px 20px;
+            border-radius: 4px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 16px;
+            color: #555;
+        }
+
+        textarea,
+        input[type="file"],
+        select,
+        input[type="number"] {
+            color: #555;
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        textarea:focus,
+        input[type="file"]:focus,
+        select:focus,
+        input[type="number"]:focus {
+            background-color: #ffffff;
+            color: #555;
+            outline: 1px solid #005af0;
+        }
+
+
+        button {
+            width: 100%;
+            padding: 14px;
+            background-color: #005af0; /* Updated to match the color scheme */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #ffffff;
+            color: #005af0;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        #exam-link {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+
+
+        .loading-spinner {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .loading-spinner i {
+            font-size: 24px;
+            color: #007bff;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* Pagination Row */
+        .pagination-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .pagination-row label {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap; /* Prevents labels from wrapping */
+        }
+
+        .pagination-row input[type="number"] {
+            flex: 1; /* Makes inputs fill the available space */
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            min-width: 0; /* Ensures inputs don't overflow */
+            background-color: #f8f9fa;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            label {
+                font-size: 14px;
+            }
+            .pagination-row input[type="number"] {
+                font-size: 14px;
+
+            }
+            .checkbox-group {
+            flex-direction: row; /* Keep checkboxes in one row */
+            gap: 10px; /* Reduce gap for smaller screens */
+            }
+
+            .checkbox-option {
+                font-size: 14px; /* Slightly smaller font for mobile */
+            }
+            .questions-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+
+            .question-options {
+                width: 100%;
+            }
+
+            .question-btn {
+                font-size: 14px; /* Slightly smaller font for mobile */
+            }
+            .container {
+                margin: 20px;
+                padding: 15px;
+                margin-bottom: 70px; /* Space for fixed navigation buttons */
+            }
+
+
+            .drop_box {
+                padding: 20px;
+            }
+
+            textarea,
+            input[type="file"],
+            select,
+            input[type="number"] {
+                font-size: 14px;
+            }
+
+            button {
+                font-size: 14px;
+            }
+
+            .pagination-row {
+                gap: 5px; /* Reduce gap for smaller screens */
+            }
+
+            .question-btn.active {
+                background-color: #007bff;
+                color: white;
+                border-color: #007bff;
+            }
+        }
+        /* Number of Questions Row */
+        .questions-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .questions-row label {
+            margin-bottom: 0;
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap; /* Prevents label from wrapping */
+        }
+
+        .question-options {
+            display: flex;
+            gap: 10px;
+            flex: 1; /* Makes the options fill the available space */
+        }
+
+        .question-btn {
+            flex: 1; /* Makes buttons fill the available space */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #f8f9fa;
+            color: #555;
+            cursor: pointer;
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .question-btn:hover {
+            background-color: #ffffff;
+            color: #005af0;
+        }
+
+        .question-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+    /* Checkbox Group */
+    .checkbox-group {
+        display: flex;
+        gap: 20px; /* Space between checkboxes */
+        align-items: center;
+    }
+
+    .checkbox-option {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        font-weight: normal;
+        color: #555;
+    }
+
+    .checkbox-custom {
+        width: 19px;
+        height: 19px;
+        border: 2px solid #007bff;
+        border-radius: 4px;
+        display: inline-block;
+        position: relative;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .checkbox-option input[type="checkbox"] {
+        display: none; /* Hide the default checkbox */
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + .checkbox-custom {
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .checkbox-option input[type="checkbox"]:checked + .checkbox-custom::after {
+        content: "✔";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 11px;
+        color: white;
+    }
+
+    .checkbox-option:hover .checkbox-custom {
+        border-color: #0056b3;
+    }
+    /* Pop-up Error Message */
+    .error-popup {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #dc3545;
+        color: white;
+        padding: 10px 15px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+        display: flex;
+        align-items: center;
+        gap: 10px; /* Space between icon and text */
+    }
+
+    .error-popup.hide {
+        opacity: 0;
+    }
+
+    .error-popup i {
+        font-size: 18px; /* Adjust icon size */
+    }
+    /* Generate Button with Icon */
+    #generate-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px; /* Space between icon and text */
+        padding: 14px;
+        background-color: #005af0;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 19px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #generate-btn:hover {
+        background-color: #0040b0; /* Darker shade for hover */
+    }
+
+    #generate-btn i {
+        font-size: 20px; /* Adjust icon size */
+    }
+    /* Overlay with Glass Effect (Pop-Up Style) */
+    .overlay {
+        position: fixed;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%); /* Center the overlay */
+        width: 300px; /* Fixed width for pop-up */
+        height: 200px; /* Fixed height for pop-up */
+        background-color: rgba(123, 123, 123, 0.141); /* Semi-transparent black background */
+        backdrop-filter: blur(8px); /* Glass effect */
+        border-radius: 15px; /* Rounded corners */
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Soft shadow */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000; /* Ensure it's on top of everything */
+        display: none; /* Hidden by default */
+    }
+
+    /* Spinner Container */
+    .overlay .loading-spinner2 {
+        text-align: center;
+    }
+
+    /* Spinner Icon */
+    .overlay .loading-spinner2 i {
+        font-size: 40px;
+        color: #007bff;; /* White color for better visibility */
+        animation: spin 1s linear infinite;
+    }
+
+    /* Loading Text */
+    .overlay .loading-spinner2 p {
+        margin-top: 15px;
+        font-size: 18px;
+        color: #007bff;; /* White color for better visibility */
+        font-weight: 500;
+    }
+
+    /* Spin Animation */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    <div class="navbar">
+        <img class="logo" src="https://images.genai.works/featured_image_92ec8d0e6a.webp?width=600&height=600&quality=50" alt="Logo">
+        <span style="color: black;">By Raafat Sami❤️</span>
+        <div class="buttons">
+            <button onclick="window.open('https://t.me/RefOoSami', '_blank')">
+                <i class="fas fa-paper-plane"></i> Contact
+            </button>
+        </div>
+    </div>
+    <div class="container">
+        <!-- Navbar -->
+       <!-- Overlay -->
+        <div id="overlay" class="overlay">
+            <div class="loading-spinner2">
+                <i class="fas fa-spinner"></i>
+                <p>Generating MCQs please Wait...</p>
+            </div>
+        </div>
+        <form method="POST" enctype="multipart/form-data" onsubmit="return validateForm()">
+            <div class="card">
+                <label>Upload File</label>
+                <div class="drop_box">
+                    <header>
+                        <h4>Select File here</h4>
+                    </header>
+                    <p>Files Supported: PDF</p>
+                    <input type="file" hidden accept=".pdf" id="fileID" style="display:none;">
+                    <button type="button" class="btn">Choose File</button>
+                </div>
+            </div>
+
+            <!-- Content Input Section -->
+            <div class="form-group">
+                <label>Topic</label>
+                <textarea id="topic" name="topic" placeholder="Enter topic or paste content here" rows="7"></textarea>
+            </div>
+
+            <!-- Pagination Section -->
+            <div class="pagination-row">
+                <label>Select page from</label>
+                <input type="number" id="start_page" name="start_page" min="1" value="10" required>
+                <label>To</label>
+                <input type="number" id="end_page" name="end_page" min="1" value="20" max="100" required>
+            </div>
+
+            <!-- Number of Questions Section -->
+            <input type="hidden" id="num_questions" name="num_questions" value="low">
+            <div class="questions-row">
+                <label>How many questions?</label>
+                <div class="question-options">
+                    <button type="button" class="question-btn active" data-value="low">Low</button>
+                    <button type="button" class="question-btn" data-value="medium">Medium</button>
+                    <button type="button" class="question-btn" data-value="high">High</button>
+                </div>
+            </div>
+
+            <!-- Question Types Section -->
+            <div class="form-group">
+                <label>Which types of MCQ questions?</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="question_types" value="Multiple Choice Question" checked>
+                        <span class="checkbox-custom"></span>
+                        Regular MCQ
+                    </label>
+                    <label class="checkbox-option">
+                        <input type="checkbox" name="question_types" value="Case Scenario Multiple Choice Question" checked>
+                        <span class="checkbox-custom"></span>
+                        Case Scenario MCQ
+                    </label>
+                </div>
+            </div>
+
+            <!-- Generate Button -->
+            <button type="submit" id="generate-btn">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate MCQs
+            </button>
+        </form>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner" id="loading-spinner">
+            <i class="fas fa-spinner"></i>
+        </div>
+
+        <!-- Error Message -->
+        <div class="error-message" id="error-message"></div>
+
+        <!-- Exam Link Button -->
+        {% if exam_ready %}
+            <div id="exam-link">
+                <a href="{{ exam_link }}" target="_blank">
+                    <button>Start Exam</button>
+                </a>
+            </div>
+        {% endif %}
+
+    </div>
+
+    <!-- Include PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" integrity="sha512-ml/QKfG3+Yes6TwOzQb7aCNtJF4PUyha6R3w8pSTo/VJSywl7ZreYvvtUso7fKevpsI+pYVVwnu82YO0q3V6eg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        const topicTextarea = document.getElementById('topic');
+        const pdfFileInput = document.getElementById('fileID');
+        const startPageInput = document.getElementById('start_page');
+        const endPageInput = document.getElementById('end_page');
+        const generateBtn = document.getElementById('generate-btn');
+        const loadingSpinner = document.getElementById('loading-spinner');
+        const errorMessage = document.getElementById('error-message');
+
+        let pdfText = ''; // Store the full extracted text from the PDF
+        let maxPages = 0; // Store the total number of pages in the PDF
+
+        // Handle PDF file upload
+        pdfFileInput.addEventListener('change', async (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                generateBtn.disabled = true;
+                loadingSpinner.style.display = 'block';
+                errorMessage.style.display = 'none';
+
+                try {
+                    const reader = new FileReader();
+                    reader.onload = async (e) => {
+                        const pdfData = new Uint8Array(e.target.result);
+                        const pdf = await pdfjsLib.getDocument({ data: pdfData }).promise;
+                        let text = '';
+
+                        maxPages = pdf.numPages; // Store the total number of pages
+                        endPageInput.max = maxPages; // Update the max value for end_page
+
+                        for (let i = 1; i <= maxPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const content = await page.getTextContent();
+                            text += content.items.map(item => item.str).join(' ') + '\f'; // Add form feed character to separate pages
+                        }
+
+                        pdfText = text; // Store the full extracted text
+                        updateTextareaContent(); // Update the textarea with the extracted text
+                        topicTextarea.readOnly = true; // Make the textarea read-only instead of disabled
+                        generateBtn.disabled = false;
+                        loadingSpinner.style.display = 'none';
+                    };
+                    reader.readAsArrayBuffer(file);
+                } catch (err) {
+                    errorMessage.textContent = 'Failed to extract text from the PDF. Please try again.';
+                    errorMessage.style.display = 'block';
+                    generateBtn.disabled = false;
+                    loadingSpinner.style.display = 'none';
+                }
+            }
+        });
+
+        // Update the textarea content based on the page range
+        function updateTextareaContent() {
+            const startPage = parseInt(startPageInput.value);
+            const endPage = parseInt(endPageInput.value);
+
+            if (pdfText) {
+                const pages = pdfText.split('\f'); // Split text by page (assuming pages are separated by form feed)
+                const selectedPages = pages.slice(startPage - 1, endPage).join('\n');
+                topicTextarea.value = selectedPages;
+            }
+        }
+
+        // Adjust start_page if end_page is set lower than start_page
+        function adjustStartPage() {
+            const startPage = parseInt(startPageInput.value);
+            const endPage = parseInt(endPageInput.value);
+
+            if (endPage < startPage) {
+                startPageInput.value = endPage - 1;
+            }
+        }
+
+        // Listen for changes in the page range inputs
+        startPageInput.addEventListener('input', () => {
+            adjustStartPage();
+            updateTextareaContent();
+        });
+
+        endPageInput.addEventListener('input', () => {
+            adjustStartPage();
+            updateTextareaContent();
+        });
+
+        // Validate form submission
+        function validateForm() {
+            if (topicTextarea.value.trim() === '' && pdfFileInput.files.length === 0) {
+                showErrorPopup('Please either enter a topic or upload a PDF file.');
+                return false;
+            }
+
+            // Ensure at least one checkbox is selected
+            const checkboxes = document.querySelectorAll('input[name="question_types"]:checked');
+            if (checkboxes.length === 0) {
+                showErrorPopup('Please select at least one question type.');
+                return false;
+            }
+
+            return true;
+        }
+        // Function to show error pop-up
+        function showErrorPopup(message) {
+            const errorPopup = document.createElement('div');
+            errorPopup.className = 'error-popup';
+
+            // Add exclamation mark icon
+            const icon = document.createElement('i');
+            icon.className = 'fas fa-exclamation-circle'; // Font Awesome icon
+            errorPopup.appendChild(icon);
+
+            // Add error message text
+            const text = document.createElement('span');
+            text.textContent = message;
+            errorPopup.appendChild(text);
+
+            // Append the pop-up to the body
+            document.body.appendChild(errorPopup);
+
+            // Fade out after 2 seconds
+            setTimeout(() => {
+                errorPopup.classList.add('hide');
+                // Remove the pop-up from the DOM after the fade-out animation
+                setTimeout(() => {
+                    document.body.removeChild(errorPopup);
+                }, 500); // Match the duration of the fade-out transition
+            }, 2000);
+        }
+
+        const dropArea = document.querySelector(".drop_box"),
+            button = dropArea.querySelector("button"),
+            dragText = dropArea.querySelector("header"),
+            input = dropArea.querySelector("input");
+        let file;
+        var filename;
+
+        button.onclick = () => {
+            input.click();
+        };
+
+        input.addEventListener("change", function (e) {
+            var fileName = e.target.files[0].name;
+            let filedata = `
+                <form action="" method="post">
+                <div class="form">
+                <h4>${fileName}</h4>
+                </div>
+                </form>`;
+            dropArea.innerHTML = filedata;
+        });
+
+        // Ensure at least one checkbox is always selected
+        const checkboxes = document.querySelectorAll('input[name="question_types"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', () => {
+                const checkedCount = document.querySelectorAll('input[name="question_types"]:checked').length;
+                if (checkedCount === 0) {
+                    checkbox.checked = true; // Re-check the checkbox if both are unchecked
+                }
+            });
+        });
+        // Add interactivity to the buttons
+        const questionButtons = document.querySelectorAll('.question-btn');
+        const numQuestionsInput = document.getElementById('num_questions');
+
+        questionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                questionButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to the clicked button
+                button.classList.add('active');
+                // Update the hidden input value
+                numQuestionsInput.value = button.getAttribute('data-value');
+                console.log('Selected value:', numQuestionsInput.value); // Debugging
+            });
+        });
+
+        // Debug form submission
+        document.querySelector('form').addEventListener('submit', (e) => {
+            console.log('Form submitted with num_questions:', numQuestionsInput.value); // Debugging
+        });
+        // Show overlay on form submission
+        document.querySelector('form').addEventListener('submit', (e) => {
+            // Validate the form
+            if (!validateForm()) {
+                e.preventDefault(); // Prevent form submission if validation fails
+                return; // Stop further execution
+            }
+
+            // If the form is valid, show the overlay and disable the button
+            document.getElementById('overlay').style.display = 'flex';
+            generateBtn.disabled = true; // Disable the generate button
+        });
+
+        // Hide overlay when the exam is ready
+        window.addEventListener('load', () => {
+            document.getElementById('overlay').style.display = 'none'; // Hide the overlay
+            generateBtn.disabled = false; // Enable the generate button
+        });
+        // Initialize Particles.js
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": ["#FFCA28", "#FFD54F", "#FFE082", "#FFECB3", "#FFF8E1", "#E3F2FD", "#BBDEFB", "#90CAF9", "#64B5F6", "#42A5F5"]
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.6,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "opacity_min": 0.3
+                    }
+                },
+                "size": {
+                    "value": 4,
+                    "random": true
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "bottom",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "events": {
+                    "onhover": {
+                        "enable": false
+                    },
+                    "onclick": {
+                        "enable": false
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+</html>

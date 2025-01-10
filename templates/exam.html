@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Particles.js -->
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/webp" href="https://images.genai.works/featured_image_92ec8d0e6a.webp?width=600&height=600&quality=50">
+    <title>Exam - {{ exam_id }}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+        /* Navbar Styles */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #F5FFF9;
+            color: rgb(255, 255, 255);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 10px;
+        }
+        .navbar img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+        .navbar .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .navbar button {
+            padding: 8px 16px;
+            background-color: #007bff;
+            border: 1px solid rgba(0, 0, 0, 0);
+            border-radius: 5px;
+            color: rgb(255, 255, 255);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .navbar button:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Rest of the styles remain the same */
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: transparent;
+            border-radius: 10px;
+            position: relative;
+            padding-bottom: 90px; /* Space for fixed navigation buttons */
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 10px;
+            background-color: #007bff;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+        .card {
+            display: none;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            background-color: #fdfdfd2a;
+            backdrop-filter: blur(10px); /* Glass effect */
+        }
+        .card.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .card h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .card p {
+            margin: 8px 0;
+            color: #555;
+        }
+        .card strong {
+            color: #000;
+        }
+        .options {
+            margin: 15px 0;
+        }
+        .option {
+            display: flex;
+            padding: 16px 24px;
+            margin-bottom: 10px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 16px;
+            align-self: stretch;
+            border-radius: 12px;
+            border: 1px solid rgb(225, 235, 229);
+            background-color: rgb(255, 255, 255);
+            box-shadow: rgba(8, 47, 19, 0.08) 0px 1px 2px 0px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .option:hover {
+            box-shadow: rgba(8, 47, 19, 0.15) 0px 2px 4px 0px;
+        }
+        .option.selected {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+        }
+        .option.correct {
+            border: 1px solid rgb(132, 226, 159);
+            background-color: rgb(218, 251, 227);
+            box-shadow: rgba(135, 225, 160, 0.32) 0px 1.5px 1.5px 0px;
+            color: #000;
+            animation: correctAnswer 0.5s ease;
+        }
+        .option.incorrect {
+            border: 1px solid rgb(221, 153, 153);
+            background-color: rgb(252, 229, 229);
+            box-shadow: rgba(225, 135, 135, 0.24) 0px 1.5px 1.5px 0px;
+            color: #000;
+            animation: incorrectAnswer 0.5s ease;
+        }
+        @keyframes correctAnswer {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        @keyframes incorrectAnswer {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+        .option.disabled {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .reasoning {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #F5FFF9;
+            border-radius: 5px;
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        .navigation {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #F5FFF9;
+            padding: 10px 20px;
+            box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navigation button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .navigation button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .navigation button:hover {
+            background-color: #0056b3;
+        }
+        .question-counter {
+            font-size: 16px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        /* Sound Control Button */
+        .sound-control {
+            position: fixed;
+            bottom: 70px; /* Adjusted for navbar */
+            right: 15px;
+            background-color: #007bff98;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s ease;
+        }
+        .sound-control:hover {
+            background-color: #0056b3;
+        }
+
+        .victory-screen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.9);
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            text-align: center;
+            z-index: 1000;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: transparent;
+            border: none;
+            color: #555;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #dc3545; /* Red color on hover */
+        }
+
+        .victory-screen h1 {
+            font-size: 48px;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        .victory-screen p {
+            font-size: 24px;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .victory-screen button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin: 5px;
+        }
+
+        .victory-screen button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 15px;
+            }
+            .card {
+                padding: 15px;
+            }
+            .option {
+                padding: 12px 20px;
+            }
+            .navigation {
+                padding: 10px 15px;
+            }
+            .navigation button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            .question-counter {
+                font-size: 14px;
+            }
+        }
+        /* Scenario Styling */
+    .scenario {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 15px;
+        padding: 10px;
+        background-color: #F5FFF9;
+        border-radius: 8px;
+        border: 1px solid #e1f8ea;
+    }
+    </style>
+</head>
+<body>
+    <!-- Particles Background -->
+    <div id="particles-js"></div>
+    <!-- Navbar -->
+    <div class="navbar">
+        <img class="logo" src="https://images.genai.works/featured_image_92ec8d0e6a.webp?width=600&height=600&quality=50" alt="Logo">
+        <div class="buttons">
+            <button onclick="window.location.href='/'">
+                <i class="fas fa-plus"></i> Make Test
+            </button>
+            <button onclick="window.open('https://t.me/RefOoSami', '_blank')">
+                <i class="fas fa-paper-plane"></i> Contact
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+
+        <!-- Questions -->
+        {% if questions %}
+            {% for question in questions %}
+                <div class="card" data-index="{{ loop.index0 }}">
+                    <h3>
+                        {% if question.card_type == 'Case Scenario Multiple Choice Question' %}
+                            <div class="scenario">
+                                {{ question.case_scenario_details }}
+                            </div>
+                            <div class="question">
+                                {{ question.question }}
+                            </div>
+                        {% else %}
+                            {{ question.question }}
+                        {% endif %}
+                    </h3>
+                    <div class="options">
+                        {% for option in question.distractor_answers_for_multiple_choice_question %}
+                            <div class="option" data-value="{{ option }}">{{ option }}</div>
+                        {% endfor %}
+                        <div class="option" data-value="{{ question.answer }}">{{ question.answer }}</div>
+                    </div>
+                    <div class="reasoning">
+                        <p><strong>More Info:</strong><br> {{ question.reasoning_for_correct_answer }}</p>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No questions found for this exam.</p>
+        {% endif %}
+    </div>
+
+    <!-- Fixed Navigation Buttons -->
+    <div class="navigation">
+        <button id="prev-btn" disabled>
+            <i class="fas fa-arrow-left"></i> Previous
+        </button>
+        <div class="question-counter" id="question-counter">1 of {{ questions|length }}</div>
+        <button id="next-btn">
+            Next <i class="fas fa-arrow-right"></i>
+        </button>
+    </div>
+
+    <!-- Sound Control Button -->
+    <button class="sound-control" id="sound-control">
+        <i class="fas fa-volume-up"></i>
+    </button>
+
+    <!-- Victory Screen -->
+    <div class="victory-screen" id="victory-screen">
+        <!-- Close Button at Top Right -->
+        <button id="close-btn" class="close-btn">
+            <i class="fas fa-times"></i>
+        </button>
+
+        <!-- Victory Content -->
+        <h1>🎉 Congratulations!</h1>
+        <p>You scored <span id="score"></span> out of {{ questions|length }}!</p>
+        <button id="share-btn">
+            <i class="fas fa-share"></i> Share Exam Link
+        </button>
+    </div>
+
+
+    <!-- Audio for Sound Effects -->
+    <audio id="correct-sound" src="https://cdn.freesound.org/previews/476/476178_6101353-lq.mp3"></audio>
+    <audio id="incorrect-sound" src="https://cdn.freesound.org/previews/590/590035_129727-lq.mp3"></audio>
+
+    <script>
+        const cards = document.querySelectorAll('.card');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const progressBar = document.getElementById('progress');
+        const questionCounter = document.getElementById('question-counter');
+        const correctSound = document.getElementById('correct-sound');
+        const incorrectSound = document.getElementById('incorrect-sound');
+        const soundControl = document.getElementById('sound-control');
+        const victoryScreen = document.getElementById('victory-screen');
+        const scoreDisplay = document.getElementById('score');
+        const shareBtn = document.getElementById('share-btn');
+        const closeBtn = document.getElementById('close-btn');
+        let currentIndex = 0;
+        let answeredCount = 0;
+        let score = 0;
+        let isSoundEnabled = true;
+        let wrongAnswers = []; // Store indices of questions answered incorrectly
+
+        // Show the first card initially
+        cards[currentIndex].classList.add('active');
+
+        // Update progress bar
+        function updateProgress() {
+            const progress = (answeredCount / cards.length) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Update question counter
+        function updateQuestionCounter() {
+            questionCounter.textContent = `${currentIndex + 1} of ${cards.length}`;
+        }
+
+        // Function to show the current card
+        function showCard(index) {
+            cards.forEach((card, i) => {
+                card.classList.toggle('active', i === index);
+            });
+            prevBtn.disabled = index === 0;
+            nextBtn.disabled = index === cards.length - 1;
+            updateQuestionCounter();
+        }
+
+        // Shuffle options for the current card
+        function shuffleOptions(card) {
+            const optionsContainer = card.querySelector('.options');
+            const options = Array.from(optionsContainer.children);
+            options.sort(() => Math.random() - 0.5);
+            optionsContainer.innerHTML = '';
+            options.forEach(option => optionsContainer.appendChild(option));
+        }
+
+        // Event listeners for navigation buttons
+        prevBtn.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                showCard(currentIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+                showCard(currentIndex);
+                shuffleOptions(cards[currentIndex]); // Shuffle options for the new card
+            }
+        });
+
+        // Event listeners for selecting options
+        cards.forEach((card, index) => {
+            const options = card.querySelectorAll('.option');
+            const reasoning = card.querySelector('.reasoning');
+            const correctAnswer = card.querySelector('.option[data-value="' + card.querySelector('.options').lastElementChild.dataset.value + '"]');
+
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    // Disable all options after one is selected
+                    options.forEach(opt => {
+                        opt.classList.add('disabled');
+                        opt.style.pointerEvents = 'none';
+                    });
+
+                    // Mark the selected option
+                    option.classList.add('selected');
+
+                    // Show reasoning
+                    reasoning.style.display = 'block';
+
+                    // Check if the selected option is correct
+                    if (option.dataset.value === correctAnswer.dataset.value) {
+                        option.classList.add('correct');
+                        if (isSoundEnabled) correctSound.play(); // Play correct sound
+                        score++;
+                    } else {
+                        option.classList.add('incorrect');
+                        correctAnswer.classList.add('correct');
+                        if (isSoundEnabled) incorrectSound.play(); // Play incorrect sound
+                        wrongAnswers.push(index); // Store the index of the wrong answer
+                    }
+
+                    // Update progress
+                    answeredCount++;
+                    updateProgress();
+
+                    // Check if all questions are answered
+                    if (answeredCount === cards.length) {
+                        victoryScreen.style.display = 'flex';
+                        scoreDisplay.textContent = score;
+                    }
+                });
+            });
+        });
+
+        // Sound control button
+        soundControl.addEventListener('click', () => {
+            isSoundEnabled = !isSoundEnabled;
+            soundControl.innerHTML = isSoundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+        });
+
+        // Share exam link button
+        shareBtn.addEventListener('click', () => {
+            const examLink = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Exam Link',
+                    text: 'Check out this exam!',
+                    url: examLink,
+                });
+            } else {
+                alert(`Share this exam link: ${examLink}`);
+            }
+        });
+
+
+        // Close victory screen button
+        closeBtn.addEventListener('click', () => {
+            victoryScreen.style.display = 'none';
+        });
+
+        // Initialize question counter
+        updateQuestionCounter();
+        // Initialize Particles.js
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": ["#FFCA28", "#FFD54F", "#FFE082", "#FFECB3", "#FFF8E1", "#E3F2FD", "#BBDEFB", "#90CAF9", "#64B5F6", "#42A5F5"]
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.6,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "opacity_min": 0.3
+                    }
+                },
+                "size": {
+                    "value": 4,
+                    "random": true
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "bottom",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "events": {
+                    "onhover": {
+                        "enable": false
+                    },
+                    "onclick": {
+                        "enable": false
+                    }
+                }
+            },
+            "retina_detect": true
+        });
+    </script>
+</body>
+</html>
