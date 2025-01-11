@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/webp" href="https://images.genai.works/featured_image_92ec8d0e6a.webp?width=600&height=600&quality=50">
     <title>Exam - {{ exam_id }}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     <style>
         /* Your existing CSS styles */
         * {
@@ -29,7 +31,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background-color: #F5FFF9;
+            background-color: #E9F8FF;
             color: rgb(255, 255, 255);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
             margin-bottom: 10px;
@@ -163,7 +165,7 @@
         .reasoning {
             margin-top: 20px;
             padding: 15px;
-            background-color: #F5FFF9;
+            background-color: #E9F8FF;
             border-radius: 5px;
             display: none;
             animation: fadeIn 0.5s ease;
@@ -173,7 +175,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background-color: #F5FFF9;
+            background-color: #E9F8FF;
             padding: 10px 20px;
             box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
             display: flex;
@@ -224,6 +226,8 @@
         .sound-control:hover {
             background-color: #0056b3;
         }
+
+        /* Victory Screen */
         .victory-screen {
             display: none;
             position: fixed;
@@ -231,18 +235,40 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.9);
             justify-content: center;
             align-items: center;
-            flex-direction: column;
-            text-align: center;
             z-index: 1000;
-            animation: fadeIn 0.5s ease;
         }
+
+        /* Background Overlay */
+        .victory-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7); /* Semi-transparent black overlay */
+            backdrop-filter: blur(5px); /* Blur effect */
+        }
+
+        /* Victory Card */
+        .victory-card {
+            position: relative;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            animation: slideIn 0.5s ease;
+        }
+
+        /* Close Button */
         .close-btn {
             position: absolute;
-            top: 20px;
-            right: 20px;
+            top: 15px;
+            right: 15px;
             background-color: transparent;
             border: none;
             color: #555;
@@ -250,33 +276,72 @@
             cursor: pointer;
             transition: color 0.3s ease;
         }
+
         .close-btn:hover {
-            color: #dc3545;
+            color: #dc3545; /* Red color on hover */
         }
-        .victory-screen h1 {
+
+        /* Victory Content */
+        .victory-content h1 {
             font-size: 48px;
-            color: #28a745;
+            color: #28a745; /* Green color for success */
             margin-bottom: 20px;
+            animation: bounce 1s ease;
         }
-        .victory-screen p {
+
+        .victory-content p {
             font-size: 24px;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
-        .victory-screen button {
-            padding: 10px 20px;
+
+        .victory-content button {
+            padding: 12px 24px;
             background-color: #007bff;
             color: white;
             border: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-            margin: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 auto;
         }
-        .victory-screen button:hover {
+
+        .victory-content button:hover {
             background-color: #0056b3;
+            transform: translateY(-3px); /* Lift effect on hover */
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
         }
         @media (max-width: 768px) {
+            .victory-content h1 {
+                font-size: 25px;
+            }
             .container {
                 padding: 15px;
             }
@@ -302,7 +367,7 @@
             color: #555;
             margin-bottom: 15px;
             padding: 10px;
-            background-color: #F5FFF9;
+            background-color: #E9F8FF;
             border-radius: 8px;
             border: 1px solid #e1f8ea;
         }
@@ -310,6 +375,7 @@
             text-align: center;
             padding: 20px;
             font-size: 18px;
+            font-family: 'Cairo';
             color: #555;
         }
         #loading-indicator i {
@@ -342,7 +408,7 @@
 
         <!-- Loading Indicator -->
         <div id="loading-indicator">
-            <i class="fas fa-spinner fa-spin"></i> Loading questions...
+            <i class="fas fa-spinner fa-spin"></i> Loading questions...,<br> من فضلك اعد تحميل الصفحة عدة مرات حتي يستقر عدد الاسئلة!
         </div>
 
         <!-- Questions Container -->
@@ -369,17 +435,25 @@
 
     <!-- Victory Screen -->
     <div class="victory-screen" id="victory-screen">
-        <!-- Close Button at Top Right -->
-        <button id="close-btn" class="close-btn">
-            <i class="fas fa-times"></i>
-        </button>
+        <!-- Background Overlay -->
+        <div class="victory-overlay"></div>
 
-        <!-- Victory Content -->
-        <h1>🎉 Congratulations!</h1>
-        <p>You scored <span id="score"></span> out of <span id="total-questions"></span>!</p>
-        <button id="share-btn">
-            <i class="fas fa-share"></i> Share Exam Link
-        </button>
+        <!-- Victory Card -->
+        <div class="victory-card">
+            <!-- Close Button at Top Right -->
+            <button id="close-btn" class="close-btn">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <!-- Victory Content -->
+            <div class="victory-content">
+                <h1>🎉 Congratulations!</h1>
+                <p>You scored <span id="score"></span> out of <span id="total-questions"></span>!</p>
+                <button id="share-btn">
+                    <i class="fas fa-share"></i> Share Exam
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- Audio for Sound Effects -->
@@ -409,6 +483,7 @@
         let wrongAnswers = [];
         let questions = [];
         let previousQuestionLength = 0; // Track the number of questions fetched in the previous request
+        let fetchInterval; // Declare the interval variable globally
 
         // Function to fetch questions
         async function fetchQuestions() {
@@ -429,6 +504,7 @@
                     // Stop fetching if no new questions are added
                     if (data.questions.length === previousQuestionLength) {
                         clearInterval(fetchInterval); // Stop fetching
+                        console.log('No new questions added. Stopping fetch.');
                     }
                 }
             } catch (error) {
@@ -457,7 +533,7 @@
                         `).join('')}
                     </div>
                     <div class="reasoning">
-                        <p><strong>More Info:</strong><br> ${question.reasoning_for_correct_answer}</p>
+                        <!-- More Info content will be dynamically added here -->
                     </div>
                 `;
                 questionsContainer.appendChild(card);
@@ -480,6 +556,68 @@
             return allOptions;
         }
 
+        // Function to fetch "More Info" data
+        async function fetchMoreInfo(question, correctAnswer, userAnswer, cardId, keyConceptName, topicsList) {
+            try {
+                const response = await fetch('/fetch_more_info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        question: question,
+                        correct_answer: correctAnswer,
+                        user_answer: userAnswer,
+                        card_id: cardId,
+                        key_concept_name: keyConceptName,
+                        topics_list: topicsList,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error fetching more info:', error);
+                return null;
+            }
+        }
+
+        // Function to update the "More Info" section
+        function updateMoreInfoSection(card, moreInfoData, userAnswer) {
+            const reasoning = card.querySelector('.reasoning');
+            reasoning.innerHTML = ''; // Clear existing content
+
+            if (moreInfoData && moreInfoData.status === 'success') {
+                // Check if the user's answer is correct
+                if (userAnswer === moreInfoData.mcq_more_info_feedback_for_correct_answer) {
+                    reasoning.innerHTML = `
+                        <p><strong>More Info</strong><br> ${moreInfoData.mcq_more_info_feedback_for_correct_answer}</p>
+                    `;
+                } else {
+                    // Show feedback for the incorrect answer
+                    const feedback = moreInfoData.mcq_incorrect_answer_to_more_info_feedback_mapping[userAnswer];
+                    if (feedback) {
+                        reasoning.innerHTML = `
+                            <p><strong>More Info</strong><br> ${feedback}</p>
+                            <p>${moreInfoData.mcq_more_info_feedback_for_correct_answer}</p>
+                        `;
+                    } else {
+                        reasoning.innerHTML = `
+                            <p><strong>More Info</strong><br> ${moreInfoData.mcq_more_info_feedback_for_correct_answer}</p>
+                        `;
+                    }
+                }
+            } else {
+                reasoning.innerHTML = `<p><strong>More Info:</strong><br> No additional feedback available.</p>`;
+            }
+
+            reasoning.style.display = 'block'; // Show the reasoning section
+        }
+
         // Function to add event listeners for options
         function addOptionEventListeners() {
             const cards = document.querySelectorAll('.card');
@@ -489,7 +627,7 @@
                 const correctAnswer = card.querySelector('.option[data-value="' + questions[index].answer + '"]');
 
                 options.forEach(option => {
-                    option.addEventListener('click', () => {
+                    option.addEventListener('click', async () => {
                         // Disable all options after one is selected
                         options.forEach(opt => {
                             opt.classList.add('disabled');
@@ -499,10 +637,7 @@
                         // Mark the selected option
                         option.classList.add('selected');
 
-                        // Show reasoning
-                        reasoning.style.display = 'block';
-
-                        // Check if the selected option is correct
+                        // Evaluate the user's answer immediately
                         if (option.dataset.value === correctAnswer.dataset.value) {
                             option.classList.add('correct');
                             if (isSoundEnabled) correctSound.play(); // Play correct sound
@@ -517,6 +652,19 @@
                         // Update progress
                         answeredCount++;
                         updateProgress();
+
+                        // Fetch "More Info" data after evaluating the answer
+                        const moreInfoData = await fetchMoreInfo(
+                            questions[index].question, // Question text
+                            questions[index].answer,   // Correct answer
+                            option.dataset.value,      // User's selected answer
+                            questions[index].card_id,  // Card ID
+                            questions[index].card_key_concept_name, // Key concept name
+                            questions[index].card_topics // Topics list
+                        );
+
+                        // Update the "More Info" section
+                        updateMoreInfoSection(card, moreInfoData, option.dataset.value);
 
                         // Check if all questions are answered
                         if (answeredCount === questions.length) {
@@ -592,8 +740,62 @@
         });
 
         // Start fetching questions periodically
-        const fetchInterval = setInterval(fetchQuestions, 7000); // Fetch every 5 seconds
+        fetchInterval = setInterval(fetchQuestions, 5000); // Fetch every 5 seconds
         fetchQuestions(); // Fetch immediately on page load
+
+        // Initialize Particles.js
+        particlesJS('particles-js', {
+            "particles": {
+                "number": {
+                    "value": 100,
+                    "density": {
+                        "enable": true,
+                        "value_area": 800
+                    }
+                },
+                "color": {
+                    "value": ["#FFCA28", "#FFD54F", "#FFE082", "#FFECB3", "#FFF8E1", "#E3F2FD", "#BBDEFB", "#90CAF9", "#64B5F6", "#42A5F5"]
+                },
+                "shape": {
+                    "type": "circle",
+                    "stroke": {
+                        "width": 0,
+                        "color": "#000000"
+                    }
+                },
+                "opacity": {
+                    "value": 0.6,
+                    "anim": {
+                        "enable": true,
+                        "speed": 1,
+                        "opacity_min": 0.3
+                    }
+                },
+                "size": {
+                    "value": 4,
+                    "random": true
+                },
+                "move": {
+                    "enable": true,
+                    "speed": 1,
+                    "direction": "bottom",
+                    "random": false,
+                    "straight": false,
+                    "out_mode": "out"
+                }
+            },
+            "interactivity": {
+                "events": {
+                    "onhover": {
+                        "enable": false
+                    },
+                    "onclick": {
+                        "enable": false
+                    }
+                }
+            },
+            "retina_detect": true
+        });
     </script>
 </body>
 </html>
