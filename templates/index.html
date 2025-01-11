@@ -6,7 +6,7 @@
     <link rel="icon" type="image/webp" href="https://images.genai.works/featured_image_92ec8d0e6a.webp?width=600&height=600&quality=50">
     <!-- Particles.js -->
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
-    <title>RefOo Quiz Generator</title>
+    <title>RefOo MCQ Generator</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
@@ -33,7 +33,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            background-color: #F5FFF9;
+            background-color: #E9F8FF;
             color: rgb(255, 255, 255);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
@@ -568,7 +568,7 @@
                         Regular MCQ
                     </label>
                     <label class="checkbox-option">
-                        <input type="checkbox" name="question_types" value="Case Scenario Multiple Choice Question" checked>
+                        <input type="checkbox" name="question_types" value="Case Scenario Multiple Choice Question">
                         <span class="checkbox-custom"></span>
                         Case Scenario MCQ
                     </label>
@@ -604,6 +604,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js" integrity="sha512-ml/QKfG3+Yes6TwOzQb7aCNtJF4PUyha6R3w8pSTo/VJSywl7ZreYvvtUso7fKevpsI+pYVVwnu82YO0q3V6eg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
+        
         const topicTextarea = document.getElementById('topic');
         const pdfFileInput = document.getElementById('fileID');
         const startPageInput = document.getElementById('start_page');
