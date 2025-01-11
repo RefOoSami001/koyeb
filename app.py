@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, jsonify,url_for
 import requests
 import time
-
+from datetime import datetime
 app = Flask(__name__)
 
 # Function to send a Telegram message
@@ -80,7 +80,57 @@ def mcq_generator(topic, num_questions_level='high', question_types=None):
         raise Exception(f"Failed to start generation process. Status code: {response.status_code}")
 
     return response.json()['deck_data_id']
+# Route to handle the "More Info" request
+@app.route('/fetch_more_info', methods=['POST'])
+def fetch_more_info():
+    # Get data from the frontend
+    data = request.json
+    question = data.get('question')
+    correct_answer = data.get('correct_answer')
+    user_answer = data.get('user_answer')
+    card_id = data.get('card_id')
+    key_concept_name = data.get('key_concept_name')
+    topics_list = data.get('topics_list')
 
+    # Headers for the external API request
+    headers = {
+        'accept': '*/*',
+        'accept-language': 'ar-EG,ar;q=0.9,en-US;q=0.8,en;q=0.7',
+        'content-type': 'application/json',
+        'origin': 'https://app.jungleai.com',
+        'referer': 'https://app.jungleai.com/',
+        'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36',
+    }
+
+    # Payload for the external API request
+    json_data = {
+        'user_id': 'qnpzdCAWX7VOkFp61r9WR365kkd2',
+        'question': question,
+        'correct_answer': correct_answer,
+        'relevant_context_for_question': None,
+        'session_id': 'd6643cbf-c576-4d8c-b22c-5d397f8e8402',
+        'key_concept_name': key_concept_name,
+        'topics_list': topics_list,
+        'card_id': card_id,
+    }
+
+    try:
+        # Make the API request
+        response = requests.post(
+            'https://wisdolia-backend-2-ywnn.zeet-wisdolia.zeet.app/cards/generate_more_info_feedback_for_all_multiple_choice_question_answer_choices',
+            headers=headers,
+            json=json_data,
+        )
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return jsonify(response.json())  # Return the API response to the frontend
+    except requests.exceptions.RequestException as e:
+        # Log the error and return an error message
+        error_data = {
+            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'errorMessage': str(e),
+            'requestPayload': json_data,
+        }
+        return jsonify(error_data), 500  # Return the error with a 500 status code
 # Home route
 @app.route('/', methods=['GET', 'POST'])
 def home():
